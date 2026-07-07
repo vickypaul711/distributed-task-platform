@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { DatabaseService } from '../database/database.service';
 
+import { CREATE_PLAN_QUERY, GET_ALL_PLANS_QUERY } from './plans.queries';
 import { CreatePlanDto } from './plans.schema';
 
 @Injectable()
@@ -10,33 +11,7 @@ export class PlansRepository {
 
   async create(data: CreatePlanDto) {
     const result = await this.databaseService.query(
-      `
-        INSERT INTO plans
-        (
-          name,
-          rate_limit_per_minute,
-          max_concurrent_jobs,
-          default_max_attempts,
-          max_allowed_attempts
-        )
-
-        VALUES
-        (
-          $1,
-          $2,
-          $3,
-          $4,
-          $5
-        )
-
-        RETURNING
-          id,
-          name,
-          rate_limit_per_minute,
-          max_concurrent_jobs,
-          default_max_attempts,
-          max_allowed_attempts
-        `,
+      CREATE_PLAN_QUERY,
       [
         data.name,
         data.rateLimitPerMinute,
@@ -50,22 +25,7 @@ export class PlansRepository {
   }
 
   async getAll() {
-    const result = await this.databaseService.query(
-      `
-      SELECT
-        id,
-        name,
-        rate_limit_per_minute,
-        max_concurrent_jobs,
-        default_max_attempts,
-        max_allowed_attempts,
-        created_at
-
-      FROM plans
-
-      ORDER BY created_at ASC
-      `,
-    );
+    const result = await this.databaseService.query(GET_ALL_PLANS_QUERY);
     return result.rows;
   }
 }

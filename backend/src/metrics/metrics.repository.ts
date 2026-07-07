@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { DatabaseService } from '../database/database.service';
+import { GET_DLQ_METRICS_QUERY, GET_JOB_METRICS_QUERY } from './metrics.queries';
 
 @Injectable()
 export class MetricsRepository {
@@ -8,56 +9,12 @@ export class MetricsRepository {
 
   async getMetrics(tenantId: string) {
     const jobs = await this.databaseService.query(
-      `
-        SELECT
-
-          COUNT(*)::int total,
-
-
-          COUNT(*)
-          FILTER(
-            WHERE status='PENDING'
-          )::int pending,
-
-
-          COUNT(*)
-          FILTER(
-            WHERE status='RUNNING'
-          )::int running,
-
-
-          COUNT(*)
-          FILTER(
-            WHERE status='SUCCESS'
-          )::int success,
-
-
-          COUNT(*)
-          FILTER(
-            WHERE status IN ('FAILED', 'DLQ')
-          )::int failed
-
-
-        FROM jobs
-
-
-        WHERE tenant_id=$1
-        `,
+      GET_JOB_METRICS_QUERY,
       [tenantId],
     );
 
     const dlq = await this.databaseService.query(
-      `
-        SELECT
-
-          COUNT(*)::int total
-
-
-        FROM dead_letter_jobs
-
-
-        WHERE tenant_id=$1
-        `,
+      GET_DLQ_METRICS_QUERY,
       [tenantId],
     );
 

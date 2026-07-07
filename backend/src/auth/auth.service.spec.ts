@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
+import { VALIDATE_API_KEY_QUERY } from './auth.queries';
 import { DatabaseService } from '../database/database.service';
 import { Tenant } from './auth.types';
 
@@ -42,10 +43,9 @@ describe('AuthService', () => {
     databaseService.query.mockResolvedValue({ rows: [tenant] });
 
     await expect(service.validateApiKey('secret')).resolves.toEqual(tenant);
-    expect(databaseService.query).toHaveBeenCalledWith(
-      expect.stringContaining('WHERE t.api_key=$1'),
-      ['secret'],
-    );
+    expect(databaseService.query).toHaveBeenCalledWith(VALIDATE_API_KEY_QUERY, [
+      'secret',
+    ]);
   });
 
   it('should return null when the API key is unknown', async () => {

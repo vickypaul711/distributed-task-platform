@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 
 import { DatabaseService } from '../database/database.service';
 
+import {
+  CREATE_TENANT_QUERY,
+  FIND_ALL_TENANTS_QUERY,
+  FIND_TENANT_BY_ID_QUERY,
+} from './tenants.queries';
 import { CreateTenantDto } from './tenants.schema';
 
 @Injectable()
@@ -10,28 +15,7 @@ export class TenantsRepository {
 
   async create(data: CreateTenantDto, apiKey: string) {
     const result = await this.databaseService.query(
-      `
-        INSERT INTO tenants
-        (
-          name,
-          api_key,
-          plan_id
-        )
-
-        VALUES
-        (
-          $1,
-          $2,
-          $3
-        )
-
-
-        RETURNING
-          id,
-          name,
-          api_key,
-          plan_id
-        `,
+      CREATE_TENANT_QUERY,
       [data.name, apiKey, data.planId],
     );
 
@@ -39,50 +23,13 @@ export class TenantsRepository {
   }
 
   async findAll() {
-    const result = await this.databaseService.query(
-      `
-        SELECT
-          tenants.id,
-          tenants.name,
-          tenants.api_key,
-          tenants.plan_id,
-          tenants.created_at,
-          plans.name AS plan_name,
-          plans.rate_limit_per_minute,
-          plans.max_concurrent_jobs,
-          plans.default_max_attempts,
-          plans.max_allowed_attempts
-        FROM tenants
-        INNER JOIN plans
-          ON plans.id = tenants.plan_id
-        ORDER BY tenants.created_at DESC
-      `,
-    );
+    const result = await this.databaseService.query(FIND_ALL_TENANTS_QUERY);
 
     return result.rows;
   }
 
   async findById(id: string) {
-    const result = await this.databaseService.query(
-      `
-        SELECT
-          tenants.id,
-          tenants.name,
-          tenants.api_key,
-          tenants.plan_id,
-          tenants.created_at,
-          plans.name AS plan_name,
-          plans.rate_limit_per_minute,
-          plans.max_concurrent_jobs,
-          plans.default_max_attempts,
-          plans.max_allowed_attempts
-        FROM tenants
-        INNER JOIN plans
-          ON plans.id = tenants.plan_id
-        WHERE tenants.id = $1
-      `,
-      [id],
-    );
+    const result = await this.databaseService.query(FIND_TENANT_BY_ID_QUERY, [id]);
 
     return result.rows[0] ?? null;
   }

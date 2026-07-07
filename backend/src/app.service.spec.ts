@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { GET_HEALTH_QUERY } from './app.queries';
 import { AppService } from './app.service';
 import { DatabaseService } from './database/database.service';
 
@@ -37,6 +38,6 @@ describe('AppService', () => {
       time: 456,
     });
 
-    expect(databaseService.query).toHaveBeenCalledWith('SELECT NOW() as time');
+    expect(databaseService.query).toHaveBeenCalledWith(GET_HEALTH_QUERY);
   });
 });

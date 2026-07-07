@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { DatabaseService } from '../database/database.service';
+import { FIND_ALL_DLQ_JOBS_QUERY } from './dlq.queries';
 
 @Injectable()
 export class DlqRepository {
@@ -8,21 +9,7 @@ export class DlqRepository {
 
   async findAll(tenantId: string) {
     const result = await this.databaseService.query(
-      `
-        SELECT
-
-          id,
-          job_id,
-          payload,
-          reason,
-          failed_at
-
-        FROM dead_letter_jobs
-
-        WHERE tenant_id=$1
-
-        ORDER BY failed_at DESC
-        `,
+      FIND_ALL_DLQ_JOBS_QUERY,
       [tenantId],
     );
 

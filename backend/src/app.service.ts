@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from './database/database.service';
+import { GET_HEALTH_QUERY } from './app.queries';
 
 @Injectable()
 export class AppService {
@@ -12,7 +13,7 @@ export class AppService {
     database: string;
     time: number;
   }> {
-    const result = await this.databaseService.query('SELECT NOW() as time');
+    const result = await this.databaseService.query(GET_HEALTH_QUERY);
 
     return {
       status: 'OK',

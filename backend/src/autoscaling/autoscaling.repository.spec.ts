@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { DatabaseService } from '../database/database.service';
+import { GET_AUTOSCALING_STATS_QUERY } from './autoscaling.queries';
 import { AutoscalingRepository } from './autoscaling.repository';
 
 describe('AutoscalingRepository', () => {
@@ -50,7 +51,7 @@ describe('AutoscalingRepository', () => {
       oldestPendingJobAgeSeconds: 45,
     });
     expect(databaseService.query).toHaveBeenCalledWith(
-      expect.stringContaining('FROM jobs'),
+      GET_AUTOSCALING_STATS_QUERY,
       ['tenant-1'],
     );
   });
